@@ -11,7 +11,7 @@
     "test": "node test/crypto.test.js && node test/scheduler.test.js"
   },
   "author": "Claire",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "devDependencies": {
     "electron": "^33.2.0",
     "electron-builder": "^25.1.8"

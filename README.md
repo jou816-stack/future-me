@@ -7,12 +7,11 @@
 ## 系統需求
 
 - macOS 13 以上（只支援 Mac；排程與常駐用的是 macOS 的 launchd）
-- Apple Silicon（M 系列）用 `arm64` 版；Intel Mac 用 `x64` 版
+- Apple Silicon（M 系列）與 Intel Mac 都可以，同一個通用版 .dmg
 
 ## 安裝
 
-1. 到 GitHub 的 **Releases** 下載對應的 `.dmg`（Apple Silicon 選 `arm64`，Intel 選 `x64`），
-   打開後把 `Future Me.app` 拖到「應用程式」。
+1. 到 GitHub 的 **Releases** 下載 `Future Me-<版本>-universal.dmg`，打開後把 `Future Me.app` 拖到「應用程式」。
 2. **這個 App 沒有 Apple 的付費簽章**，所以第一次打開 macOS 會擋。請這樣做：
    - 先雙擊一次（會出現「無法打開」）
    - 打開「系統設定 → 隱私權與安全性」，往下捲到底，會看到「Future Me 已被阻擋」→ 按「**仍要打開**」
@@ -41,7 +40,7 @@
 npm install     # 第一次
 npm start       # 開發模式啟動
 npm test        # 加密、儲存、排程的單元測試
-npm run build   # 打包：dist/mac-arm64/Future Me.app + arm64 與 x64 兩個 .dmg
+npm run build   # 打包：dist/mac-arm64/Future Me.app + 通用版 .dmg（Apple Silicon 與 Intel 都能用）
 ```
 
 開發或測試時可以把資料夾指到別處，不動到真正的信箱：
@@ -99,3 +98,7 @@ FUTURE_LETTER_DATA_DIR=/tmp/future-me-test npm start
 
 設定 → 主密碼。輸入舊密碼與新密碼後，所有信件會用新密碼重新加密。
 更換過程中請不要關閉 App。
+
+## 授權
+
+MIT License。可以自由使用、修改、再發布，保留署名即可。
