@@ -1,0 +1,19 @@
+{
+  "name": "future-me",
+  "productName": "Future Me",
+  "version": "1.0.0",
+  "description": "寫信給未來的自己。信件加密存在自己的電腦，到期自動彈出。",
+  "main": "src/main/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --mac",
+    "test": "node test/crypto.test.js && node test/scheduler.test.js"
+  },
+  "author": "Claire",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  }
+}

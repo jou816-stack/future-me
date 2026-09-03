@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: file:; connect-src 'none';" />
+  <title>Future Me</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="titlebar"></div>
+
+  <nav id="nav" class="nav" hidden>
+    <button data-nav="inbox" class="nav-btn">信箱</button>
+    <button data-nav="compose" class="nav-btn">寫信</button>
+    <button data-nav="settings" class="nav-btn">設定</button>
+    <span class="nav-spacer"></span>
+    <span id="lock-state" class="lock-state"></span>
+  </nav>
+
+  <main id="app">
+
+    <!-- 首次設定 -->
+    <section id="view-setup" class="view" hidden>
+      <div class="card narrow">
+        <h1>Future Me</h1><p class="muted small" style="margin-top:-6px">寫給未來的自己</p>
+        <p class="lead">
+          這裡的每一封信都只存在這台電腦。<br />
+          設一組主密碼，所有信件都用它加密。<br />
+          <strong>忘記密碼，信就永遠打不開了。</strong>沒有後門，也沒有人能幫你救回來。
+        </p>
+        <form id="setup-form" class="form">
+          <label>主密碼<input type="password" id="setup-pass" autocomplete="new-password" required minlength="6" /></label>
+          <label>再輸入一次<input type="password" id="setup-pass2" autocomplete="new-password" required minlength="6" /></label>
+          <label>
+            密碼提示（必填，會以明文顯示）
+            <input type="text" id="setup-hint" placeholder="例如：老家門牌 + 阿嬤的名字。不要寫「生日」。" required />
+          </label>
+          <label class="check"><input type="checkbox" id="setup-login" checked /> 登入電腦時自動開啟（信才會準時彈出）</label>
+          <p id="setup-error" class="error" hidden></p>
+          <button type="submit" class="primary">開始</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 信箱 -->
+    <section id="view-inbox" class="view" hidden>
+      <header class="view-head">
+        <h1>信箱</h1>
+        <button id="inbox-compose" class="primary">寫一封新的信</button>
+      </header>
+      <div id="inbox-empty" class="empty" hidden>
+        <p>還沒有任何信。</p>
+        <p class="muted">寫一封給一年後、三年後的自己吧。</p>
+      </div>
+      <div id="inbox-sections"></div>
+    </section>
+
+    <!-- 寫信 -->
+    <section id="view-compose" class="view" hidden>
+      <div class="compose-layout">
+        <form id="compose-form" class="compose-main">
+          <div class="row">
+            <label class="grow">
+              送達時間
+              <input type="datetime-local" id="c-when" required />
+            </label>
+            <div class="presets">
+              <button type="button" data-months="6">半年後</button>
+              <button type="button" data-months="12">一年後</button>
+              <button type="button" data-months="36">三年後</button>
+              <button type="button" data-months="60">五年後</button>
+            </div>
+          </div>
+          <p id="c-when-hint" class="muted small"></p>
+          <label>標題（可留空，會顯示在信封上，不加密）<input type="text" id="c-title" placeholder="給準備出書的自己" /></label>
+          <label>信封上的一句話（可留空，到期時直接顯示，不加密）<input type="text" id="c-epigraph" placeholder="關於那個你以為過不去的坎" /></label>
+          <label class="body-label">
+            信的內容（加密，只有輸入主密碼才看得到）
+            <textarea id="c-body" class="sheet" spellcheck="true" placeholder="親愛的未來的我，"></textarea>
+          </label>
+          <div class="row end">
+            <span id="c-paper-name" class="muted small"></span>
+            <button type="button" id="c-paper-shuffle" class="link">換一張信紙</button>
+            <span class="grow"></span>
+            <span id="c-count" class="muted small"></span>
+            <button type="submit" class="primary">封存這封信</button>
+          </div>
+        </form>
+        <aside class="compose-aside">
+          <details open>
+            <summary>想不到要寫什麼？</summary>
+            <p class="muted small">這些只是提示，可以全部跳過。這是你的信，用你自己的話。</p>
+            <ol class="prompts">
+              <li>現在的你，最想讓那時候的自己知道什麼？</li>
+              <li>你現在正在煩惱什麼？（幾年後回頭看，這通常是最珍貴的一段）</li>
+              <li>有沒有什麼是你希望那時候的自己還記得的？</li>
+              <li>如果那時候的你過得不好，你想對他說什麼？</li>
+              <li>今天發生了什麼小事，是你不想忘記的？</li>
+              <li>信封上想留一句什麼？</li>
+            </ol>
+          </details>
+          <p class="muted small">草稿只存在記憶體，關掉視窗就會消失。封存前不會寫進硬碟。</p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 拆信 -->
+    <section id="view-open" class="view" hidden>
+      <div class="letter">
+        <div id="envelope" class="envelope">
+          <p class="env-from">來自 <span id="o-created"></span> 的你</p>
+          <h1 id="o-title" class="env-title"></h1>
+          <p id="o-epigraph" class="env-epigraph"></p>
+          <p class="env-meta">預定送達 <span id="o-deliver"></span></p>
+          <button id="o-unseal" class="primary">拆開信紙</button>
+          <p id="o-error" class="error" hidden></p>
+        </div>
+        <article id="paper" class="paper sheet" hidden>
+          <p class="paper-date"><span id="p-created"></span></p>
+          <h2 id="p-title" class="paper-title"></h2>
+          <div id="p-body" class="paper-body"></div>
+          <p class="paper-sign muted small">寫於 <span id="p-created-full"></span> · 拆封於 <span id="p-opened"></span></p>
+
+          <!-- 反思：讀完之後寫給那時候的自己 -->
+          <section id="reflection" class="reflection" hidden>
+            <p class="reflection-head muted small">讀完之後，<span id="r-date"></span>的你寫下：</p>
+            <div id="r-text" class="reflection-text"></div>
+          </section>
+          <section id="reflection-edit" class="reflection-edit" hidden>
+            <p class="muted small">讀完這封信，現在的你想對那時候的自己說什麼？這段話會加密存在信的旁邊。</p>
+            <textarea id="r-input" spellcheck="true" placeholder="親愛的那時候的我，"></textarea>
+            <div class="row end">
+              <button type="button" id="r-cancel" class="secondary">取消</button>
+              <button type="button" id="r-save" class="primary">存下反思</button>
+            </div>
+          </section>
+
+          <div id="o-actions" class="row end o-actions">
+            <button id="o-delete" class="link danger-link">刪除這封信</button>
+            <span class="grow"></span>
+            <button id="o-reflect" class="secondary">寫下反思</button>
+            <button id="o-done" class="secondary">收好</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 設定 -->
+    <section id="view-settings" class="view" hidden>
+      <header class="view-head"><h1>設定</h1></header>
+      <div class="settings">
+        <div class="card">
+          <h2>排程</h2>
+          <form id="cfg-form" class="form">
+            <label>寫信時預設的送達時刻<input type="time" id="cfg-default-time" /></label>
+            <label>未拆封的信，每天幾點再提醒一次<input type="time" id="cfg-nag-time" /></label>
+            <label>輸入密碼後幾分鐘自動上鎖<input type="number" id="cfg-autolock" min="1" max="240" /></label>
+            <label class="check"><input type="checkbox" id="cfg-login" /> 登入電腦時自動開啟</label>
+            <p id="cfg-login-note" class="muted small" hidden>（開發模式下不會真的註冊登入項目，打包成 App 後才會生效）</p>
+            <button type="submit" class="secondary">儲存</button>
+          </form>
+        </div>
+        <div class="card">
+          <h2>主密碼</h2>
+          <p class="muted small">目前的提示：<span id="cfg-hint"></span></p>
+          <form id="pw-form" class="form">
+            <label>舊密碼<input type="password" id="pw-old" autocomplete="current-password" required /></label>
+            <label>新密碼<input type="password" id="pw-new" autocomplete="new-password" required minlength="6" /></label>
+            <label>再輸入一次新密碼<input type="password" id="pw-new2" autocomplete="new-password" required minlength="6" /></label>
+            <label>新的密碼提示<input type="text" id="pw-hint" required /></label>
+            <p id="pw-error" class="error" hidden></p>
+            <button type="submit" class="secondary">更換主密碼（所有信件重新加密）</button>
+          </form>
+        </div>
+        <div class="card">
+          <h2>資料</h2>
+          <p class="muted small">信件存放在：<code id="cfg-dir"></code></p>
+          <p class="muted small">平常用 Time Machine 備份即可。要換電腦或另外留一份，按「備份整個信箱」存成 zip；到新電腦解壓縮成 <code>~/Future Me</code> 再打開 App，用同一組主密碼就能接著用。</p>
+          <div class="row">
+            <button id="cfg-backup" class="secondary">備份整個信箱…</button>
+            <button id="cfg-open-folder" class="secondary">打開資料夾</button>
+            <button id="cfg-lock" class="secondary">現在上鎖</button>
+            <button id="cfg-check" class="secondary">檢查到期的信</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 密碼對話框 -->
+  <div id="pw-modal" class="modal" hidden>
+    <form id="pw-modal-form" class="modal-box">
+      <h2 id="pw-modal-title">輸入主密碼</h2>
+      <p class="muted small">提示：<span id="pw-modal-hint"></span></p>
+      <input type="password" id="pw-modal-input" autocomplete="current-password" />
+      <p id="pw-modal-error" class="error" hidden></p>
+      <div class="row end">
+        <button type="button" id="pw-modal-cancel" class="secondary">取消</button>
+        <button type="submit" class="primary">開啟</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- 確認對話框 -->
+  <div id="confirm-modal" class="modal" hidden>
+    <div class="modal-box">
+      <h2 id="confirm-title"></h2>
+      <p id="confirm-text" class="muted"></p>
+      <div class="row end">
+        <button type="button" id="confirm-cancel" class="secondary">取消</button>
+        <button type="button" id="confirm-ok" class="danger">確定</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

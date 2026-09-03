@@ -1,0 +1,21 @@
+appId: com.claire.future-me
+productName: Future Me
+directories:
+  output: dist
+files:
+  - src/**/*
+  - assets/**/*
+  - package.json
+mac:
+  category: public.app-category.lifestyle
+  target:
+    - target: dir
+      arch: [arm64]
+    - target: dmg
+      arch: [arm64, x64]
+  artifactName: "${productName}-${version}-${arch}.${ext}"
+  icon: assets/icon.png
+  identity: null
+  extendInfo:
+    LSUIElement: false
+    NSUserNotificationAlertStyle: alert
