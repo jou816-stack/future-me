@@ -11,7 +11,7 @@
 
 ## 安裝
 
-1. 到 GitHub 的 **Releases** 下載 `Future Me-<版本>-universal.dmg`，打開後把 `Future Me.app` 拖到「應用程式」。
+1. 到 GitHub 的 右側面板的**Releases** 下載 `Future Me-<版本>-universal.dmg`，打開後把 `Future Me.app` 拖到「應用程式」。
 2. **這個 App 沒有 Apple 的付費簽章**，所以第一次打開 macOS 會擋。請這樣做：
    - 先雙擊一次（會出現「無法打開」）
    - 打開「系統設定 → 隱私權與安全性」，往下捲到底，會看到「Future Me 已被阻擋」→ 按「**仍要打開**」
